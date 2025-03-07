@@ -15,24 +15,21 @@
             background-color: #1a1a1a;
             color: white;
             text-align: center;
+            position: relative;
         }
-        .network-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+        .zone {
+            position: absolute;
+            width: 33.3%;
+            height: 100%;
+            top: 0;
+            opacity: 0.3;
         }
-        .network-buttons button {
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
+        .zone:hover {
+            opacity: 0.6;
         }
-        .network-buttons button:hover {
-            background-color: #0056b3;
-        }
+        #zone-twitter { left: 0; background-color: blue; }
+        #zone-facebook { left: 33.3%; background-color: red; }
+        #zone-youtube { left: 66.6%; background-color: green; }
         #comment {
             font-size: 24px;
             max-width: 80%;
@@ -46,17 +43,31 @@
             margin-top: 10px;
             opacity: 0.7;
         }
+        #stop-button {
+            position: absolute;
+            bottom: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff4d4d;
+            color: white;
+        }
+        #stop-button:hover {
+            background-color: #cc0000;
+        }
     </style>
 </head>
 <body>
-    <h1>Selecciona una Red Social</h1>
-    <div class="network-buttons">
-        <button onclick="startExperience('Twitter')">Twitter</button>
-        <button onclick="startExperience('Facebook')">Facebook</button>
-        <button onclick="startExperience('YouTube')">YouTube</button>
-    </div>
-    <div id="comment">Selecciona una red para comenzar...</div>
+    <h1>Interactúa con las Zonas</h1>
+    <div id="comment">Pasa el mouse sobre una zona para comenzar...</div>
     <div id="timestamp"></div>
+    <button id="stop-button" onclick="stopExperience()">Detener</button>
+    
+    <div class="zone" id="zone-twitter" onmouseover="startExperience('Twitter')"></div>
+    <div class="zone" id="zone-facebook" onmouseover="startExperience('Facebook')"></div>
+    <div class="zone" id="zone-youtube" onmouseover="startExperience('YouTube')"></div>
     
     <script>
         const commentsData = {
@@ -76,8 +87,10 @@
 
         let currentNetwork = null;
         let commentIndex = 0;
+        let commentInterval;
 
         function startExperience(network) {
+            if (currentNetwork === network) return;
             currentNetwork = network;
             commentIndex = 0;
             document.querySelector("h1").textContent = "Escuchando comentarios en " + network;
@@ -98,7 +111,16 @@
             speechSynthesis.speak(utterance);
             
             commentIndex = (commentIndex + 1) % comments.length;
-            setTimeout(playNextComment, 5000); // Reproducir el siguiente comentario después de 5 segundos
+            commentInterval = setTimeout(playNextComment, 5000);
+        }
+
+        function stopExperience() {
+            speechSynthesis.cancel();
+            clearTimeout(commentInterval);
+            currentNetwork = null;
+            document.querySelector("h1").textContent = "Interactúa con las Zonas";
+            document.getElementById("comment").textContent = "Pasa el mouse sobre una zona para comenzar...";
+            document.getElementById("timestamp").textContent = "";
         }
     </script>
 </body>
