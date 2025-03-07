@@ -23,6 +23,7 @@
             height: 100%;
             top: 0;
             opacity: 0.3;
+            z-index: 1;
         }
         .zone:hover {
             opacity: 0.6;
@@ -33,6 +34,10 @@
         #zone-instagram { left: 49.8%; background-color: purple; }
         #zone-reddit { left: 66.4%; background-color: orange; }
         #zone-other { left: 83%; background-color: gray; }
+        #comment-container {
+            position: relative;
+            z-index: 2;
+        }
         #comment {
             font-size: 24px;
             max-width: 80%;
@@ -55,6 +60,7 @@
             border: none;
             border-radius: 5px;
             color: white;
+            z-index: 3;
         }
         #stop-button {
             left: 20px;
@@ -70,8 +76,10 @@
 </head>
 <body>
     <h1>Interactúa con las Zonas</h1>
-    <div id="comment">Pasa el mouse sobre una zona para comenzar...</div>
-    <div id="timestamp"></div>
+    <div id="comment-container">
+        <div id="comment">Pasa el mouse sobre una zona para comenzar...</div>
+        <div id="timestamp"></div>
+    </div>
     <button id="stop-button" onclick="stopExperience()">Detener</button>
     <button id="respond-button" onclick="respondToComment()">Responder</button>
     
@@ -81,6 +89,8 @@
     <div class="zone" id="zone-instagram" onmouseover="startExperience('Instagram')"></div>
     <div class="zone" id="zone-reddit" onmouseover="startExperience('Reddit')"></div>
     <div class="zone" id="zone-other" onmouseover="startExperience('Other')"></div>
+    
+    <audio id="background-music" loop></audio>
     
     <script>
         const commentsData = {
@@ -95,19 +105,16 @@
             YouTube: [
                 { text: "Comentario de odio en YouTube 1", timestamp: "07/03/2025 18:15" },
                 { text: "Comentario de odio en YouTube 2", timestamp: "07/03/2025 19:45" }
-            ],
-            Instagram: [
-                { text: "Comentario de odio en Instagram 1", timestamp: "07/03/2025 20:10" },
-                { text: "Comentario de odio en Instagram 2", timestamp: "07/03/2025 21:30" }
-            ],
-            Reddit: [
-                { text: "Comentario de odio en Reddit 1", timestamp: "07/03/2025 22:00" },
-                { text: "Comentario de odio en Reddit 2", timestamp: "07/03/2025 23:15" }
-            ],
-            Other: [
-                { text: "Comentario de odio en otras plataformas 1", timestamp: "08/03/2025 00:30" },
-                { text: "Comentario de odio en otras plataformas 2", timestamp: "08/03/2025 01:45" }
             ]
+        };
+
+        const backgroundMusic = {
+            Twitter: "twitter-music.mp3",
+            Facebook: "facebook-music.mp3",
+            YouTube: "youtube-music.mp3",
+            Instagram: "instagram-music.mp3",
+            Reddit: "reddit-music.mp3",
+            Other: "other-music.mp3"
         };
 
         let currentNetwork = null;
@@ -119,7 +126,11 @@
             currentNetwork = network;
             commentIndex = 0;
             document.querySelector("h1").textContent = "Escuchando comentarios en " + network;
-            playNextComment();
+            
+            document.getElementById("background-music").src = backgroundMusic[network];
+            document.getElementById("background-music").play();
+            
+            setTimeout(() => playNextComment(), 3000);
         }
 
         function playNextComment() {
@@ -130,29 +141,25 @@
             const comment = comments[commentIndex];
             document.getElementById("comment").textContent = comment.text;
             document.getElementById("timestamp").textContent = "Publicado: " + comment.timestamp;
-
+            
+            const voices = speechSynthesis.getVoices();
+            const voiceOptions = voices.filter(voice => ["es-ES", "es-MX"].includes(voice.lang));
             const utterance = new SpeechSynthesisUtterance(comment.text);
-            utterance.lang = "es-ES";
+            utterance.voice = voiceOptions[Math.floor(Math.random() * voiceOptions.length)];
             speechSynthesis.speak(utterance);
             
             commentIndex = (commentIndex + 1) % comments.length;
-            commentInterval = setTimeout(playNextComment, 5000);
+            commentInterval = setTimeout(playNextComment, 8000);
         }
 
         function stopExperience() {
             speechSynthesis.cancel();
             clearTimeout(commentInterval);
+            document.getElementById("background-music").pause();
             currentNetwork = null;
             document.querySelector("h1").textContent = "Interactúa con las Zonas";
             document.getElementById("comment").textContent = "Pasa el mouse sobre una zona para comenzar...";
             document.getElementById("timestamp").textContent = "";
-        }
-
-        function respondToComment() {
-            const response = prompt("Escribe tu respuesta al comentario de odio:");
-            if (response) {
-                alert("Tu respuesta ha sido enviada para revisión.");
-            }
         }
     </script>
 </body>
