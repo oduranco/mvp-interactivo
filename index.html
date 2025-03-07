@@ -16,6 +16,23 @@
             color: white;
             text-align: center;
         }
+        .network-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .network-buttons button {
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        .network-buttons button:hover {
+            background-color: #0056b3;
+        }
         #comment {
             font-size: 24px;
             max-width: 80%;
@@ -29,49 +46,60 @@
             margin-top: 10px;
             opacity: 0.7;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            margin-top: 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #ff4d4d;
-            color: white;
-        }
-        button:hover {
-            background-color: #cc0000;
-        }
     </style>
 </head>
 <body>
-    <h1>Comentarios Aleatorios</h1>
-    <div id="comment">Cargando comentario...</div>
+    <h1>Selecciona una Red Social</h1>
+    <div class="network-buttons">
+        <button onclick="startExperience('Twitter')">Twitter</button>
+        <button onclick="startExperience('Facebook')">Facebook</button>
+        <button onclick="startExperience('YouTube')">YouTube</button>
+    </div>
+    <div id="comment">Selecciona una red para comenzar...</div>
     <div id="timestamp"></div>
-    <button onclick="playComment()">Escuchar Comentario</button>
     
     <script>
-        const comments = [
-            { text: "Los judíos controlan todo, no deberían tener tanto poder.", timestamp: "07/03/2025 14:30" },
-            { text: "El holocausto fue exagerado, solo propaganda.", timestamp: "07/03/2025 15:10" },
-            { text: "Los judíos son los culpables de la crisis económica.", timestamp: "07/03/2025 16:45" }
-        ];
-        
-        function getRandomComment() {
-            const randomIndex = Math.floor(Math.random() * comments.length);
-            const comment = comments[randomIndex];
+        const commentsData = {
+            Twitter: [
+                { text: "Comentario de odio en Twitter 1", timestamp: "07/03/2025 14:30" },
+                { text: "Comentario de odio en Twitter 2", timestamp: "07/03/2025 15:10" }
+            ],
+            Facebook: [
+                { text: "Comentario de odio en Facebook 1", timestamp: "07/03/2025 16:00" },
+                { text: "Comentario de odio en Facebook 2", timestamp: "07/03/2025 17:20" }
+            ],
+            YouTube: [
+                { text: "Comentario de odio en YouTube 1", timestamp: "07/03/2025 18:15" },
+                { text: "Comentario de odio en YouTube 2", timestamp: "07/03/2025 19:45" }
+            ]
+        };
+
+        let currentNetwork = null;
+        let commentIndex = 0;
+
+        function startExperience(network) {
+            currentNetwork = network;
+            commentIndex = 0;
+            document.querySelector("h1").textContent = "Escuchando comentarios en " + network;
+            playNextComment();
+        }
+
+        function playNextComment() {
+            if (!currentNetwork) return;
+            const comments = commentsData[currentNetwork];
+            if (comments.length === 0) return;
+
+            const comment = comments[commentIndex];
             document.getElementById("comment").textContent = comment.text;
             document.getElementById("timestamp").textContent = "Publicado: " + comment.timestamp;
-        }
-        
-        function playComment() {
-            const commentText = document.getElementById("comment").textContent;
-            const utterance = new SpeechSynthesisUtterance(commentText);
+
+            const utterance = new SpeechSynthesisUtterance(comment.text);
             utterance.lang = "es-ES";
             speechSynthesis.speak(utterance);
+            
+            commentIndex = (commentIndex + 1) % comments.length;
+            setTimeout(playNextComment, 5000); // Reproducir el siguiente comentario después de 5 segundos
         }
-        
-        getRandomComment();
     </script>
 </body>
 </html>
