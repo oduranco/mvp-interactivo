@@ -4,8 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MVP Interactivo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #1a1a1a;
+            color: white;
+            text-align: center;
+        }
+        #comment {
+            font-size: 24px;
+            max-width: 80%;
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid white;
+            border-radius: 10px;
+        }
+        #timestamp {
+            font-size: 14px;
+            margin-top: 10px;
+            opacity: 0.7;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff4d4d;
+            color: white;
+        }
+        button:hover {
+            background-color: #cc0000;
+        }
+    </style>
 </head>
 <body>
-    <h1>¡Hola, esto es una prueba del MVP en Vercel!</h1>
+    <h1>Comentarios Aleatorios</h1>
+    <div id="comment">Cargando comentario...</div>
+    <div id="timestamp"></div>
+    <button onclick="playComment()">Escuchar Comentario</button>
+    
+    <script>
+        const comments = [
+            { text: "Los judíos controlan todo, no deberían tener tanto poder.", timestamp: "07/03/2025 14:30" },
+            { text: "El holocausto fue exagerado, solo propaganda.", timestamp: "07/03/2025 15:10" },
+            { text: "Los judíos son los culpables de la crisis económica.", timestamp: "07/03/2025 16:45" }
+        ];
+        
+        function getRandomComment() {
+            const randomIndex = Math.floor(Math.random() * comments.length);
+            const comment = comments[randomIndex];
+            document.getElementById("comment").textContent = comment.text;
+            document.getElementById("timestamp").textContent = "Publicado: " + comment.timestamp;
+        }
+        
+        function playComment() {
+            const commentText = document.getElementById("comment").textContent;
+            const utterance = new SpeechSynthesisUtterance(commentText);
+            utterance.lang = "es-ES";
+            speechSynthesis.speak(utterance);
+        }
+        
+        getRandomComment();
+    </script>
 </body>
 </html>
