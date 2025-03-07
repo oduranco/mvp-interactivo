@@ -19,7 +19,7 @@
         }
         .zone {
             position: absolute;
-            width: 33.3%;
+            width: 16.6%;
             height: 100%;
             top: 0;
             opacity: 0.3;
@@ -28,8 +28,11 @@
             opacity: 0.6;
         }
         #zone-twitter { left: 0; background-color: blue; }
-        #zone-facebook { left: 33.3%; background-color: red; }
-        #zone-youtube { left: 66.6%; background-color: green; }
+        #zone-facebook { left: 16.6%; background-color: red; }
+        #zone-youtube { left: 33.2%; background-color: green; }
+        #zone-instagram { left: 49.8%; background-color: purple; }
+        #zone-reddit { left: 66.4%; background-color: orange; }
+        #zone-other { left: 83%; background-color: gray; }
         #comment {
             font-size: 24px;
             max-width: 80%;
@@ -43,7 +46,7 @@
             margin-top: 10px;
             opacity: 0.7;
         }
-        #stop-button {
+        #stop-button, #respond-button {
             position: absolute;
             bottom: 20px;
             padding: 10px 20px;
@@ -51,12 +54,18 @@
             cursor: pointer;
             border: none;
             border-radius: 5px;
-            background-color: #ff4d4d;
             color: white;
         }
-        #stop-button:hover {
-            background-color: #cc0000;
+        #stop-button {
+            left: 20px;
+            background-color: #ff4d4d;
         }
+        #respond-button {
+            right: 20px;
+            background-color: #4CAF50;
+        }
+        #stop-button:hover { background-color: #cc0000; }
+        #respond-button:hover { background-color: #388E3C; }
     </style>
 </head>
 <body>
@@ -64,10 +73,14 @@
     <div id="comment">Pasa el mouse sobre una zona para comenzar...</div>
     <div id="timestamp"></div>
     <button id="stop-button" onclick="stopExperience()">Detener</button>
+    <button id="respond-button" onclick="respondToComment()">Responder</button>
     
     <div class="zone" id="zone-twitter" onmouseover="startExperience('Twitter')"></div>
     <div class="zone" id="zone-facebook" onmouseover="startExperience('Facebook')"></div>
     <div class="zone" id="zone-youtube" onmouseover="startExperience('YouTube')"></div>
+    <div class="zone" id="zone-instagram" onmouseover="startExperience('Instagram')"></div>
+    <div class="zone" id="zone-reddit" onmouseover="startExperience('Reddit')"></div>
+    <div class="zone" id="zone-other" onmouseover="startExperience('Other')"></div>
     
     <script>
         const commentsData = {
@@ -82,6 +95,18 @@
             YouTube: [
                 { text: "Comentario de odio en YouTube 1", timestamp: "07/03/2025 18:15" },
                 { text: "Comentario de odio en YouTube 2", timestamp: "07/03/2025 19:45" }
+            ],
+            Instagram: [
+                { text: "Comentario de odio en Instagram 1", timestamp: "07/03/2025 20:10" },
+                { text: "Comentario de odio en Instagram 2", timestamp: "07/03/2025 21:30" }
+            ],
+            Reddit: [
+                { text: "Comentario de odio en Reddit 1", timestamp: "07/03/2025 22:00" },
+                { text: "Comentario de odio en Reddit 2", timestamp: "07/03/2025 23:15" }
+            ],
+            Other: [
+                { text: "Comentario de odio en otras plataformas 1", timestamp: "08/03/2025 00:30" },
+                { text: "Comentario de odio en otras plataformas 2", timestamp: "08/03/2025 01:45" }
             ]
         };
 
@@ -121,6 +146,13 @@
             document.querySelector("h1").textContent = "Interactúa con las Zonas";
             document.getElementById("comment").textContent = "Pasa el mouse sobre una zona para comenzar...";
             document.getElementById("timestamp").textContent = "";
+        }
+
+        function respondToComment() {
+            const response = prompt("Escribe tu respuesta al comentario de odio:");
+            if (response) {
+                alert("Tu respuesta ha sido enviada para revisión.");
+            }
         }
     </script>
 </body>
