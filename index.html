@@ -18,17 +18,39 @@
             position: relative;
             overflow: hidden;
         }
-        .zone {
+        #main-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100vh;
             position: absolute;
-            width: 16.6%;
-            height: 100%;
-            top: 0;
-            opacity: 0.3;
-            z-index: 1;
-            transition: transform 0.5s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 10;
+        }
+        .zone-container {
+            display: flex;
+            width: 100%;
+            height: 50px;
+            justify-content: space-around;
+            position: absolute;
+            bottom: 10%;
+        }
+        .zone {
+            width: 100px;
+            height: 50px;
+            background-color: white;
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
         }
         .zone:hover {
-            opacity: 0.6;
+            transform: scale(1.1);
         }
         #expanded-view {
             position: absolute;
@@ -71,19 +93,23 @@
     </style>
 </head>
 <body>
-    <h1>Interactúa con las Zonas</h1>
+    <div id="main-screen">
+        <h1>Selecciona una Red Social</h1>
+        <div class="zone-container">
+            <div class="zone" onclick="startExperience('Twitter')">Twitter</div>
+            <div class="zone" onclick="startExperience('Facebook')">Facebook</div>
+            <div class="zone" onclick="startExperience('YouTube')">YouTube</div>
+            <div class="zone" onclick="startExperience('Instagram')">Instagram</div>
+            <div class="zone" onclick="startExperience('Reddit')">Reddit</div>
+            <div class="zone" onclick="startExperience('Other')">Otras</div>
+        </div>
+    </div>
+
     <div id="expanded-view">
         <div id="expanded-comment">Cargando...</div>
         <img id="expanded-media" src="" alt="" style="display:none;">
         <button id="stop-button" onclick="closeExpandedView()">Salir</button>
     </div>
-    
-    <div class="zone" id="zone-twitter" onmouseover="startExperience('Twitter')" style="left: 0; background-color: blue;"></div>
-    <div class="zone" id="zone-facebook" onmouseover="startExperience('Facebook')" style="left: 16.6%; background-color: red;"></div>
-    <div class="zone" id="zone-youtube" onmouseover="startExperience('YouTube')" style="left: 33.2%; background-color: green;"></div>
-    <div class="zone" id="zone-instagram" onmouseover="startExperience('Instagram')" style="left: 49.8%; background-color: purple;"></div>
-    <div class="zone" id="zone-reddit" onmouseover="startExperience('Reddit')" style="left: 66.4%; background-color: orange;"></div>
-    <div class="zone" id="zone-other" onmouseover="startExperience('Other')" style="left: 83%; background-color: gray;"></div>
     
     <script>
         const commentsData = {
@@ -105,7 +131,7 @@
         let commentIndex = 0;
 
         function startExperience(network) {
-            if (currentNetwork === network) return;
+            document.getElementById("main-screen").style.display = "none";
             currentNetwork = network;
             commentIndex = 0;
             document.getElementById("expanded-view").style.display = "flex";
@@ -127,26 +153,13 @@
                 document.getElementById("expanded-media").style.display = "none";
             }
             
-            fetch('https://api.elevenlabs.io/v1/text-to-speech', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer TU_API_KEY'
-                },
-                body: JSON.stringify({ text: comment.text, voice: "es-ES" })
-            })
-            .then(response => response.json())
-            .then(data => {
-                const audio = new Audio(data.audio_url);
-                audio.play();
-            });
-            
             commentIndex = (commentIndex + 1) % comments.length;
             setTimeout(playNextComment, 8000);
         }
 
         function closeExpandedView() {
             document.getElementById("expanded-view").style.display = "none";
+            document.getElementById("main-screen").style.display = "flex";
             currentNetwork = null;
         }
     </script>
