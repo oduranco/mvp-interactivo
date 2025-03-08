@@ -16,6 +16,7 @@
             color: white;
             text-align: center;
             position: relative;
+            overflow: hidden;
         }
         .zone {
             position: absolute;
@@ -24,34 +25,37 @@
             top: 0;
             opacity: 0.3;
             z-index: 1;
+            transition: transform 0.5s ease-in-out;
         }
         .zone:hover {
             opacity: 0.6;
         }
-        #zone-twitter { left: 0; background-color: blue; }
-        #zone-facebook { left: 16.6%; background-color: red; }
-        #zone-youtube { left: 33.2%; background-color: green; }
-        #zone-instagram { left: 49.8%; background-color: purple; }
-        #zone-reddit { left: 66.4%; background-color: orange; }
-        #zone-other { left: 83%; background-color: gray; }
-        #comment-container {
-            position: relative;
-            z-index: 2;
+        #expanded-view {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            color: white;
         }
-        #comment {
-            font-size: 24px;
+        #expanded-comment {
+            font-size: 28px;
             max-width: 80%;
             margin: 20px;
             padding: 20px;
             border: 2px solid white;
             border-radius: 10px;
         }
-        #timestamp {
-            font-size: 14px;
-            margin-top: 10px;
-            opacity: 0.7;
+        #expanded-media {
+            max-width: 80%;
+            height: auto;
+            margin-top: 20px;
         }
-        #stop-button, #respond-button {
+        #stop-button {
             position: absolute;
             bottom: 20px;
             padding: 10px 20px;
@@ -59,78 +63,53 @@
             cursor: pointer;
             border: none;
             border-radius: 5px;
-            color: white;
-            z-index: 3;
-        }
-        #stop-button {
-            left: 20px;
             background-color: #ff4d4d;
-        }
-        #respond-button {
-            right: 20px;
-            background-color: #4CAF50;
+            color: white;
+            z-index: 6;
         }
         #stop-button:hover { background-color: #cc0000; }
-        #respond-button:hover { background-color: #388E3C; }
     </style>
 </head>
 <body>
     <h1>Interactúa con las Zonas</h1>
-    <div id="comment-container">
-        <div id="comment">Pasa el mouse sobre una zona para comenzar...</div>
-        <div id="timestamp"></div>
+    <div id="expanded-view">
+        <div id="expanded-comment">Cargando...</div>
+        <img id="expanded-media" src="" alt="" style="display:none;">
+        <button id="stop-button" onclick="closeExpandedView()">Salir</button>
     </div>
-    <button id="stop-button" onclick="stopExperience()">Detener</button>
-    <button id="respond-button" onclick="respondToComment()">Responder</button>
     
-    <div class="zone" id="zone-twitter" onmouseover="startExperience('Twitter')"></div>
-    <div class="zone" id="zone-facebook" onmouseover="startExperience('Facebook')"></div>
-    <div class="zone" id="zone-youtube" onmouseover="startExperience('YouTube')"></div>
-    <div class="zone" id="zone-instagram" onmouseover="startExperience('Instagram')"></div>
-    <div class="zone" id="zone-reddit" onmouseover="startExperience('Reddit')"></div>
-    <div class="zone" id="zone-other" onmouseover="startExperience('Other')"></div>
-    
-    <audio id="background-music" loop></audio>
+    <div class="zone" id="zone-twitter" onmouseover="startExperience('Twitter')" style="left: 0; background-color: blue;"></div>
+    <div class="zone" id="zone-facebook" onmouseover="startExperience('Facebook')" style="left: 16.6%; background-color: red;"></div>
+    <div class="zone" id="zone-youtube" onmouseover="startExperience('YouTube')" style="left: 33.2%; background-color: green;"></div>
+    <div class="zone" id="zone-instagram" onmouseover="startExperience('Instagram')" style="left: 49.8%; background-color: purple;"></div>
+    <div class="zone" id="zone-reddit" onmouseover="startExperience('Reddit')" style="left: 66.4%; background-color: orange;"></div>
+    <div class="zone" id="zone-other" onmouseover="startExperience('Other')" style="left: 83%; background-color: gray;"></div>
     
     <script>
         const commentsData = {
             Twitter: [
-                { text: "Comentario de odio en Twitter 1", timestamp: "07/03/2025 14:30" },
-                { text: "Comentario de odio en Twitter 2", timestamp: "07/03/2025 15:10" }
+                { text: "Comentario de odio en Twitter 1", media: "twitter1.jpg" },
+                { text: "Comentario de odio en Twitter 2", media: "twitter2.jpg" }
             ],
             Facebook: [
-                { text: "Comentario de odio en Facebook 1", timestamp: "07/03/2025 16:00" },
-                { text: "Comentario de odio en Facebook 2", timestamp: "07/03/2025 17:20" }
+                { text: "Comentario de odio en Facebook 1", media: "facebook1.jpg" },
+                { text: "Comentario de odio en Facebook 2", media: "facebook2.jpg" }
             ],
             YouTube: [
-                { text: "Comentario de odio en YouTube 1", timestamp: "07/03/2025 18:15" },
-                { text: "Comentario de odio en YouTube 2", timestamp: "07/03/2025 19:45" }
+                { text: "Comentario de odio en YouTube 1", media: "youtube1.jpg" },
+                { text: "Comentario de odio en YouTube 2", media: "youtube2.jpg" }
             ]
-        };
-
-        const backgroundMusic = {
-            Twitter: "twitter-music.mp3",
-            Facebook: "facebook-music.mp3",
-            YouTube: "youtube-music.mp3",
-            Instagram: "instagram-music.mp3",
-            Reddit: "reddit-music.mp3",
-            Other: "other-music.mp3"
         };
 
         let currentNetwork = null;
         let commentIndex = 0;
-        let commentInterval;
 
         function startExperience(network) {
             if (currentNetwork === network) return;
             currentNetwork = network;
             commentIndex = 0;
-            document.querySelector("h1").textContent = "Escuchando comentarios en " + network;
-            
-            document.getElementById("background-music").src = backgroundMusic[network];
-            document.getElementById("background-music").play();
-            
-            setTimeout(() => playNextComment(), 3000);
+            document.getElementById("expanded-view").style.display = "flex";
+            playNextComment();
         }
 
         function playNextComment() {
@@ -139,27 +118,36 @@
             if (comments.length === 0) return;
 
             const comment = comments[commentIndex];
-            document.getElementById("comment").textContent = comment.text;
-            document.getElementById("timestamp").textContent = "Publicado: " + comment.timestamp;
+            document.getElementById("expanded-comment").textContent = comment.text;
             
-            const voices = speechSynthesis.getVoices();
-            const voiceOptions = voices.filter(voice => ["es-ES", "es-MX"].includes(voice.lang));
-            const utterance = new SpeechSynthesisUtterance(comment.text);
-            utterance.voice = voiceOptions[Math.floor(Math.random() * voiceOptions.length)];
-            speechSynthesis.speak(utterance);
+            if (comment.media) {
+                document.getElementById("expanded-media").src = comment.media;
+                document.getElementById("expanded-media").style.display = "block";
+            } else {
+                document.getElementById("expanded-media").style.display = "none";
+            }
+            
+            fetch('https://api.elevenlabs.io/v1/text-to-speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer TU_API_KEY'
+                },
+                body: JSON.stringify({ text: comment.text, voice: "es-ES" })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const audio = new Audio(data.audio_url);
+                audio.play();
+            });
             
             commentIndex = (commentIndex + 1) % comments.length;
-            commentInterval = setTimeout(playNextComment, 8000);
+            setTimeout(playNextComment, 8000);
         }
 
-        function stopExperience() {
-            speechSynthesis.cancel();
-            clearTimeout(commentInterval);
-            document.getElementById("background-music").pause();
+        function closeExpandedView() {
+            document.getElementById("expanded-view").style.display = "none";
             currentNetwork = null;
-            document.querySelector("h1").textContent = "Interactúa con las Zonas";
-            document.getElementById("comment").textContent = "Pasa el mouse sobre una zona para comenzar...";
-            document.getElementById("timestamp").textContent = "";
         }
     </script>
 </body>
